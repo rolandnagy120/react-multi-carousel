@@ -41,7 +41,7 @@ class Index extends React.Component {
     }
     return { deviceType };
   }
-  state = { isMoving: false }
+  state = { isMoving: false, autoPlay: true }
   render() {
     const { classes } = this.props;
     const images = [
@@ -91,51 +91,29 @@ class Index extends React.Component {
         partialVisibilityGutter: 30
       }
     };
+
     return (
       <div className={classes.root}>
         <Carousel
-          /*
-          disableSwipeOnMobile
-          disableDrag
-          */
-          responsive={responsive}
-          ssr
-          showDots
-          centerMode
-          arrows={false}
-          infinite={true}
-          beforeChange={() => this.setState({ isMoving: true })}
-          afterChange={() => this.setState({ isMoving: false })}
-          containerClass="container"
-          slidesToSlide={1}
-          deviceType={this.props.deviceType}
-        >
-          {fakerData.map((card, index) => {
-            return <Card index={index} isMoving={this.state.isMoving} {...card} />;
-          })}
-        </Carousel>
-
-        <Carousel
-          /*
-          disableSwipeOnMobile
-          disableDrag
-          */
           responsive={responsive}
           ssr
           showDots
           minimumTouchDrag={80}
           slidesToSlide={1}
-
           partialVisbile={true}
-          //infinite={true}
+          infinite={true}
+          autoPlay={this.state.autoPlay}
+          customTransition={`all 2600ms linear`}
+          transitionDuration={2600}
+          autoPlaySpeed={1}
           containerClass="container-with-dots"
           itemClass="image-item"
-          deviceType={this.props.deviceType}
         >
           {fakerData.slice(0,5).map(card => {
             return <Image url={card.image} alt={card.headline} />;
           })}
         </Carousel>
+        <button onClick={() => this.setState({...this.state, autoPlay: !this.state.autoPlay})}>Stop!</button>
       </div>
     );
   }

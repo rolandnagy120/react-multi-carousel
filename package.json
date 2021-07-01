@@ -130,5 +130,7 @@
     "uglify-js": "^3.5.11",
     "uglifycss": "0.0.29"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@types/node": "^15.12.5"
+  }
 }

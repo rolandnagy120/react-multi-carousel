@@ -160,7 +160,7 @@ class Carousel extends React.Component<CarouselProps, CarouselInternalState> {
       window.addEventListener("keyup", this.onKeyUp as React.EventHandler<any>);
     }
     if (this.props.autoPlay && this.props.autoPlaySpeed) {
-      this.autoPlay = setInterval(this.next, this.props.autoPlaySpeed);
+      this.startAutoPlay();
     }
   }
 
@@ -320,11 +320,10 @@ class Carousel extends React.Component<CarouselProps, CarouselInternalState> {
       window.addEventListener("keyup", this.onKeyUp as React.EventHandler<any>);
     }
     if (autoPlay && !this.props.autoPlay && this.autoPlay) {
-      clearInterval(this.autoPlay);
-      this.autoPlay = undefined;
+      this.stopAutoPlay();
     }
     if (!autoPlay && this.props.autoPlay && !this.autoPlay) {
-      this.autoPlay = setInterval(this.next, this.props.autoPlaySpeed);
+      this.startAutoPlay();
     }
     if (children.length !== this.props.children.length) {
       // this is for handling changing children only.
@@ -369,6 +368,7 @@ class Carousel extends React.Component<CarouselProps, CarouselInternalState> {
       domLoaded
     ) {
       if (isReachingTheEnd || isReachingTheStart) {
+        // console.log("correctItemsPositionooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
         this.isAnimationAllowed = false;
         setTimeout(() => {
           this.setState({
@@ -460,8 +460,7 @@ class Carousel extends React.Component<CarouselProps, CarouselInternalState> {
       >);
     }
     if (this.props.autoPlay && this.autoPlay) {
-      clearInterval(this.autoPlay);
-      this.autoPlay = undefined;
+      this.stopAutoPlay();
     }
     if (this.itemsToShowTimeout) {
       clearTimeout(this.itemsToShowTimeout);
@@ -506,8 +505,7 @@ class Carousel extends React.Component<CarouselProps, CarouselInternalState> {
       this.props.autoPlay &&
       this.props.pauseOnHover
     ) {
-      clearInterval(this.autoPlay);
-      this.autoPlay = undefined;
+      this.stopAutoPlay();
     }
     if (this.onMove) {
       if (!(Math.abs(diffX) > Math.abs(diffY))) {
@@ -538,7 +536,7 @@ class Carousel extends React.Component<CarouselProps, CarouselInternalState> {
   }
   public handleOut(e: React.MouseEvent | React.TouchEvent): void {
     if (this.props.autoPlay && !this.autoPlay) {
-      this.autoPlay = setInterval(this.next, this.props.autoPlaySpeed);
+      this.startAutoPlay();
     }
     const shouldDisableOnMobile =
       e.type === "touchend" && !this.props.swipeable;
@@ -621,8 +619,7 @@ class Carousel extends React.Component<CarouselProps, CarouselInternalState> {
   }
   public handleEnter(): void {
     if (this.autoPlay && this.props.autoPlay) {
-      clearInterval(this.autoPlay);
-      this.autoPlay = undefined;
+      this.stopAutoPlay();
     }
   }
   public goToSlide(slide: number, skipCallbacks?: SkipCallbackOptions): void {
@@ -727,6 +724,25 @@ class Carousel extends React.Component<CarouselProps, CarouselInternalState> {
     );
   }
 
+  private stopAutoPlay() {
+    const { additionalTransfrom } = this.props;
+    if (this.listRef && this.listRef.current) {
+      const currentPosition = this.listRef.current.getBoundingClientRect().x;
+      // this.listRef.current.style.transition = "none";
+      this.listRef.current.style.transform = `translate3d(${currentPosition +
+        additionalTransfrom!}px,0,0)`;
+      // this.listRef.current.style.transition =
+      //     this.props.customTransition || defaultTransition;
+    }
+
+    clearInterval(this.autoPlay);
+    this.autoPlay = undefined;
+  }
+
+  private startAutoPlay() {
+    this.autoPlay = setInterval(this.next, this.props.autoPlaySpeed);
+  }
+
   public render(): React.ReactNode {
     const {
       deviceType,
@@ -766,6 +782,8 @@ class Carousel extends React.Component<CarouselProps, CarouselInternalState> {
 
     // this lib supports showing next set of items partially as well as center mode which shows both.
     const currentTransform = getTransform(this.state, this.props);
+    // console.log("currentTransform");
+    // console.log(currentTransform);
     return (
       <>
         <div
